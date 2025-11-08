@@ -6,6 +6,10 @@ class TypeWarn(Warning):
 
 def _is_valid(type_: object, obj: object):
     if type_ == typing.Any: return True
+    if type(type_) == list: # list of types
+        for t in type_:
+            if isinstance(obj, t): return True
+        return False
     return isinstance(obj, type_)
 
 # Hard to read
@@ -30,6 +34,9 @@ def type_check(should_raise: bool = False, debug: bool = False):
                 if _is_valid(ast.Subscript,arg.annotation):
                     print("[type_check] Subscript annotation is not supported. Found:", ast.unparse(arg.annotation))
                     arg_type[arg.arg] = typing.Any
+                elif _is_valid(ast.BinOp, arg.annotation):
+                    names = [locate(node.id) for node in ast.walk(arg.annotation) if isinstance(node, ast.Name)]
+                    arg_type[arg.arg] = names
                 else: arg_type[arg.arg] = locate(ast.unparse(arg.annotation))
             else:
                 arg_type[arg.arg] = typing.Any

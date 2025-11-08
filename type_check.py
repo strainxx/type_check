@@ -35,8 +35,7 @@ def type_check(should_raise: bool = False, debug: bool = False):
                     print("[type_check] Subscript annotation is not supported. Found:", ast.unparse(arg.annotation))
                     arg_type[arg.arg] = typing.Any
                 elif _is_valid(ast.BinOp, arg.annotation):
-                    names = [locate(node.id) for node in ast.walk(arg.annotation) if isinstance(node, ast.Name)]
-                    arg_type[arg.arg] = names
+                    arg_type[arg.arg] = [locate(node.id) for node in ast.walk(arg.annotation) if isinstance(node, ast.Name)]
                 else: arg_type[arg.arg] = locate(ast.unparse(arg.annotation))
             else:
                 arg_type[arg.arg] = typing.Any
